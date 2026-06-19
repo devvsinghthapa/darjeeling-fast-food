@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About & Contact — Darjeeling Fast Food</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #FAFAF8; --bg-alt: #F0EBE1; --text: #1A1A1A;
+      --muted: #666; --red: #D63031; --red-dark: #B52828;
+      --green: #27AE60; --border: #E0D9CF; --white: #fff;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    .nav { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 200; padding: 0 56px; display: flex; align-items: center; justify-content: space-between; height: 66px; }
+    .nav-brand { font-family: Georgia, serif; font-size: 19px; font-weight: bold; color: var(--red); text-decoration: none; }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 15px; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--red); }
+    .nav-cta { background: var(--red); color: var(--white); padding: 9px 22px; border-radius: 6px; font-size: 14px; text-decoration: none; font-weight: 600; }
+    .nav-cta:hover { background: var(--red-dark); }
+
+    .page-header { background: #1A1A1A; padding: 72px 56px 56px; color: var(--white); }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .eyebrow { font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--red); font-weight: 700; margin-bottom: 12px; }
+    .page-header h1 { font-family: Georgia, serif; font-size: 52px; line-height: 1.1; margin-bottom: 12px; }
+    .page-header p { font-size: 16px; color: #aaa; max-width: 500px; }
+
+    /* ABOUT STORY */
+    .sec { padding: 88px 56px; }
+    .sec-alt { background: var(--bg-alt); }
+    .sec-label { font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--red); font-weight: 700; margin-bottom: 10px; }
+    .sec-title { font-family: Georgia, serif; font-size: 38px; line-height: 1.2; margin-bottom: 16px; }
+    .sec-sub { font-size: 16px; color: var(--muted); max-width: 480px; }
+
+    .story-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+    .story-text p { font-size: 16px; color: var(--muted); line-height: 1.85; margin-bottom: 18px; }
+    .story-text p:last-child { margin-bottom: 0; }
+    .story-highlight {
+      background: #1A1A1A; border-radius: 12px; padding: 40px;
+      display: flex; flex-direction: column; gap: 28px;
+    }
+    .highlight-item .num { font-family: Georgia, serif; font-size: 44px; color: var(--red); line-height: 1; }
+    .highlight-item .label { font-size: 14px; color: #aaa; margin-top: 4px; }
+
+    /* TEAM / VALUES */
+    .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .val-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 28px 24px; }
+    .val-icon { font-size: 28px; margin-bottom: 14px; }
+    .val-card h3 { font-size: 18px; font-family: Georgia, serif; margin-bottom: 8px; }
+    .val-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* CONTACT */
+    .contact-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 56px; align-items: start; }
+    .contact-form { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 36px; }
+    .contact-form h2 { font-family: Georgia, serif; font-size: 22px; margin-bottom: 24px; }
+    .form-field { margin-bottom: 18px; }
+    .form-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 7px;
+      font-size: 15px; background: var(--bg); color: var(--text); font-family: inherit; transition: border-color 0.15s;
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { outline: none; border-color: var(--red); background: var(--white); }
+    .send-btn { width: 100%; background: var(--red); color: var(--white); border: none; padding: 13px; border-radius: 7px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .send-btn:hover { background: var(--red-dark); }
+    .sent-msg { display: none; background: #f0fdf4; border: 1.5px solid var(--green); border-radius: 8px; padding: 16px; font-size: 14px; color: #155724; margin-top: 14px; text-align: center; }
+
+    /* CONTACT INFO SIDEBAR */
+    .contact-info { display: flex; flex-direction: column; gap: 20px; }
+    .ci-block { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+    .ci-block h4 { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+    .ci-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+    .ci-row:last-child { margin-bottom: 0; }
+    .ci-row .ci-icon { font-size: 18px; flex-shrink: 0; line-height: 1.5; }
+    .ci-row .ci-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+    .ci-row .ci-text a { color: var(--red); text-decoration: none; }
+    .hours-list { list-style: none; }
+    .hours-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .hours-list li:last-child { border-bottom: none; }
+    .hours-list li span { color: var(--red); font-weight: 600; }
+
+    /* MAP BLOCK */
+    .map-block { background: #1A1A1A; border-radius: 12px; padding: 40px; text-align: center; }
+    .map-block .m-icon { font-size: 56px; margin-bottom: 16px; }
+    .map-block h3 { font-family: Georgia, serif; font-size: 22px; color: var(--white); margin-bottom: 8px; }
+    .map-block p { font-size: 14px; color: #aaa; margin-bottom: 24px; line-height: 1.7; }
+    .map-block a { background: var(--red); color: var(--white); padding: 11px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; }
+    .map-block a:hover { background: var(--red-dark); }
+
+    /* FOOTER */
+    .footer { background: #111; color: #aaa; padding: 56px 56px 28px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 56px; margin-bottom: 40px; }
+    .footer-brand { font-family: Georgia, serif; font-size: 20px; color: var(--white); margin-bottom: 10px; }
+    .footer p { font-size: 14px; line-height: 1.8; }
+    .footer h5 { color: var(--white); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+    .footer ul { list-style: none; }
+    .footer ul li { margin-bottom: 8px; }
+    .footer ul li a { color: #aaa; text-decoration: none; font-size: 14px; }
+    .footer ul li a:hover { color: var(--white); }
+    .footer-bottom { border-top: 1px solid #222; padding-top: 20px; font-size: 13px; display: flex; justify-content: space-between; }
+    .footer-bottom a { color: #aaa; text-decoration: none; }
+
+    @media (max-width: 900px) {
+      .nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .page-header { padding: 48px 20px 36px; }
+      .page-header h1 { font-size: 36px; }
+      .sec { padding: 56px 20px; }
+      .story-layout, .contact-layout { grid-template-columns: 1fr; gap: 32px; }
+      .values-grid { grid-template-columns: 1fr; }
+      .footer { padding: 40px 20px 20px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-brand">🍜 Darjeeling Fast Food</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="booking.html">Book a Table</a></li>
+    <li><a href="about.html" class="active">About & Contact</a></li>
+  </ul>
+  <a href="booking.html" class="nav-cta">Reserve a Seat</a>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <div class="eyebrow">Our story</div>
+    <h1>About Us</h1>
+    <p>A small fast food joint run by the family — built for the people of Haripur Kalan.</p>
+  </div>
+</div>
+
+<!-- STORY -->
+<section class="sec">
+  <div class="container">
+    <div class="story-layout">
+      <div class="story-text">
+        <div class="sec-label">How it started</div>
+        <h2 class="sec-title">Started small.<br>Still going strong.</h2>
+        <p>Darjeeling Fast Food started as a small dhaba with a handful of tables and a simple idea — serve fresh, hot food at prices anyone could afford. We've been feeding students, workers, families, and travellers in Haripur Kalan for years.</p>
+        <p>Our menu is straightforward: momos, rolls, Chinese, thalis, and a proper cup of masala chai. We don't pretend to be anything fancy. We just try to make sure every dish that comes out of our kitchen is worth coming back for.</p>
+        <p>Everything is cooked fresh every day. Our kitchen opens at 10 AM and the last order goes out at 9:45 PM. No stale food, no shortcuts.</p>
+      </div>
+      <div class="story-highlight">
+        <div class="highlight-item">
+          <div class="num">20</div>
+          <div class="label">Seats in the restaurant</div>
+        </div>
+        <div class="highlight-item">
+          <div class="num">₹20</div>
+          <div class="label">Starting price for a chai</div>
+        </div>
+        <div class="highlight-item">
+          <div class="num">18+</div>
+          <div class="label">Items on the menu</div>
+        </div>
+        <div class="highlight-item">
+          <div class="num">11 AM</div>
+          <div class="label">Open every single day</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="sec sec-alt">
+  <div class="container">
+    <div style="margin-bottom:48px;">
+      <div class="sec-label">What we believe in</div>
+      <h2 class="sec-title">How we run things</h2>
+    </div>
+    <div class="values-grid">
+      <div class="val-card">
+        <div class="val-icon">🥘</div>
+        <h3>Fresh every day</h3>
+        <p>We don't cook yesterday's food. Every morning starts with fresh prep — vegetables, dough, marination. If it's not fresh, it doesn't go out.</p>
+      </div>
+      <div class="val-card">
+        <div class="val-icon">💬</div>
+        <h3>Honest prices</h3>
+        <p>Our prices are printed on the menu and they don't change based on who's asking. No hidden charges, no service fee surprises.</p>
+      </div>
+      <div class="val-card">
+        <div class="val-icon">🙏</div>
+        <h3>For the neighbourhood</h3>
+        <p>We're here for the people of Haripur Kalan. Students on a budget, families on a Sunday, workers grabbing lunch — everyone's welcome here.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="sec" id="contact">
+  <div class="container">
+    <div style="margin-bottom: 48px;">
+      <div class="sec-label">Reach out</div>
+      <h2 class="sec-title">Get in Touch</h2>
+      <p class="sec-sub">For reservations, feedback, or just to say hi — we're easy to reach.</p>
+    </div>
+    <div class="contact-layout">
+      <div class="contact-form">
+        <h2>Send us a message</h2>
+        <div class="form-field">
+          <label>Your Name</label>
+          <input type="text" id="cName" placeholder="e.g. Priya Verma"/>
+        </div>
+        <div class="form-field">
+          <label>Phone or Email</label>
+          <input type="text" id="cContact" placeholder="Phone number or email"/>
+        </div>
+        <div class="form-field">
+          <label>Subject</label>
+          <select id="cSubject">
+            <option>General Query</option>
+            <option>Feedback / Review</option>
+            <option>Table Booking Help</option>
+            <option>Menu Question</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Message</label>
+          <textarea id="cMsg" rows="4" placeholder="Write your message here..."></textarea>
+        </div>
+        <button class="send-btn" onclick="sendMsg()">Send Message</button>
+        <div class="sent-msg" id="sentMsg">✅ Message received! We'll get back to you within 24 hours.</div>
+      </div>
+
+      <div class="contact-info">
+        <div class="ci-block">
+          <h4>Contact Details</h4>
+          <div class="ci-row">
+            <div class="ci-icon">📞</div>
+            <div class="ci-text"><a href="tel:+919876543210">+91 98765 43210</a><br>Call us any time we're open</div>
+          </div>
+          <div class="ci-row">
+            <div class="ci-icon">📍</div>
+            <div class="ci-text">Haripur Kalan, Haridwar<br>Uttarakhand – 249 401</div>
+          </div>
+          <div class="ci-row">
+            <div class="ci-icon">🚗</div>
+            <div class="ci-text">Near the main chowk, opposite the old peepal tree</div>
+          </div>
+        </div>
+
+        <div class="ci-block">
+          <h4>Opening Hours</h4>
+          <ul class="hours-list">
+            <li>Monday – Friday <span>11 AM – 10 PM</span></li>
+            <li>Saturday <span>10 AM – 10:30 PM</span></li>
+            <li>Sunday <span>10 AM – 10 PM</span></li>
+            <li>Holidays <span>11 AM – 9 PM</span></li>
+          </ul>
+        </div>
+
+        <div class="map-block">
+          <div class="m-icon">📍</div>
+          <h3>Darjeeling Fast Food</h3>
+          <p>Haripur Kalan, Haridwar, Uttarakhand<br>Easy to find — just ask anyone in the area.</p>
+          <a href="https://maps.google.com/?q=Haripur+Kalan+Haridwar+Uttarakhand" target="_blank">Open in Maps</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec sec-alt">
+  <div class="container" style="text-align:center; padding: 20px 0;">
+    <div class="sec-label" style="justify-content:center; display:flex;">Ready to eat?</div>
+    <h2 class="sec-title" style="margin: 0 auto 14px;">Come visit us or book a table.</h2>
+    <p style="font-size:16px; color:var(--muted); margin-bottom:32px;">We're open every day. No dress code, no fuss.</p>
+    <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+      <a href="menu.html" style="background:var(--red); color:#fff; padding:13px 28px; border-radius:6px; font-size:15px; font-weight:600; text-decoration:none;">View Menu</a>
+      <a href="booking.html" style="background:transparent; color:var(--red); border:2px solid var(--red); padding:13px 28px; border-radius:6px; font-size:15px; font-weight:600; text-decoration:none;">Book a Table</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">🍜 Darjeeling Fast Food</div>
+        <p>Your everyday neighbourhood restaurant in Haripur Kalan. Good food, honest prices, no nonsense.</p>
+      </div>
+      <div>
+        <h5>Pages</h5>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="booking.html">Book a Table</a></li>
+          <li><a href="about.html">About & Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="tel:+919876543210">+91 98765 43210</a></li>
+          <li><a>Haripur Kalan, Haridwar</a></li>
+          <li><a>Uttarakhand – 249 401</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Darjeeling Fast Food</span>
+      <a href="admin.html">Staff Login</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function sendMsg() {
+    const name = document.getElementById('cName').value.trim();
+    const msg = document.getElementById('cMsg').value.trim();
+    if (!name || !msg) { alert('Please fill in your name and message.'); return; }
+    document.getElementById('sentMsg').style.display = 'block';
+    document.getElementById('cName').value = '';
+    document.getElementById('cContact').value = '';
+    document.getElementById('cMsg').value = '';
+  }
+</script>
+</body>
+</html>
