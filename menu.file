@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menu — Darjeeling Fast Food</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #FAFAF8; --bg-alt: #F0EBE1; --text: #1A1A1A;
+      --muted: #666; --red: #D63031; --red-dark: #B52828;
+      --green: #27AE60; --border: #E0D9CF; --white: #fff;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    /* NAV */
+    .nav { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 200; padding: 0 56px; display: flex; align-items: center; justify-content: space-between; height: 66px; }
+    .nav-brand { font-family: Georgia, serif; font-size: 19px; font-weight: bold; color: var(--red); text-decoration: none; }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 15px; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--red); }
+    .nav-cta { background: var(--red); color: var(--white); padding: 9px 22px; border-radius: 6px; font-size: 14px; text-decoration: none; font-weight: 600; }
+    .nav-cta:hover { background: var(--red-dark); }
+
+    /* PAGE HEADER */
+    .page-header {
+      background: #1A1A1A; padding: 72px 56px 56px; color: var(--white);
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .page-header .eyebrow { font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--red); font-weight: 700; margin-bottom: 12px; }
+    .page-header h1 { font-family: Georgia, serif; font-size: 52px; line-height: 1.1; margin-bottom: 12px; }
+    .page-header p { font-size: 16px; color: #aaa; }
+
+    /* FILTER BAR */
+    .filter-bar {
+      background: var(--white); border-bottom: 1px solid var(--border);
+      padding: 0 56px; position: sticky; top: 66px; z-index: 100;
+    }
+    .filter-inner { max-width: 1100px; margin: 0 auto; display: flex; gap: 0; align-items: center; overflow-x: auto; }
+    .filter-btn {
+      padding: 18px 24px; border: none; background: transparent; cursor: pointer;
+      font-size: 14px; color: var(--muted); font-weight: 500; white-space: nowrap;
+      border-bottom: 3px solid transparent; transition: all 0.15s;
+    }
+    .filter-btn:hover { color: var(--red); }
+    .filter-btn.active { color: var(--red); border-bottom-color: var(--red); font-weight: 700; }
+    .type-toggle { margin-left: auto; display: flex; gap: 8px; padding: 14px 0; flex-shrink: 0; }
+    .type-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s; }
+    .type-btn.veg-active { background: #e8f5e9; border-color: var(--green); color: var(--green); }
+    .type-btn.nonveg-active { background: #fdecea; border-color: var(--red); color: var(--red); }
+    .type-btn:hover { border-color: var(--text); }
+
+    /* MENU BODY */
+    .menu-body { padding: 56px; }
+    .cat-section { margin-bottom: 72px; }
+    .cat-header {
+      display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px;
+      padding-bottom: 16px; border-bottom: 2px solid var(--border);
+    }
+    .cat-header h2 { font-family: Georgia, serif; font-size: 28px; }
+    .cat-header span { font-size: 13px; color: var(--muted); }
+
+    .items-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .item-card {
+      background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+      padding: 22px 24px; display: flex; flex-direction: column; gap: 8px;
+      transition: box-shadow 0.15s;
+    }
+    .item-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+    .item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .item-name { font-family: Georgia, serif; font-size: 17px; font-weight: 600; }
+    .veg-dot { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; margin-top: 3px; }
+    .veg-dot.veg { border: 2px solid var(--green); }
+    .veg-dot.veg::after { content:''; display:block; width:6px; height:6px; border-radius:50%; background:var(--green); margin:2px auto; }
+    .veg-dot.nonveg { border: 2px solid var(--red); }
+    .veg-dot.nonveg::after { content:''; display:block; width:6px; height:6px; border-radius:50%; background:var(--red); margin:2px auto; }
+    .item-desc { font-size: 13px; color: var(--muted); line-height: 1.6; flex-grow: 1; }
+    .item-price { font-size: 22px; font-weight: 700; color: var(--red); margin-top: 4px; }
+    .item-unavail { opacity: 0.45; pointer-events: none; }
+    .unavail-badge { font-size: 11px; background: #f0f0f0; color: #999; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+
+    /* EMPTY STATE */
+    .empty-state { padding: 80px 0; text-align: center; color: var(--muted); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state p { font-size: 16px; }
+
+    /* FOOTER */
+    .footer { background: #111; color: #aaa; padding: 56px 56px 28px; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 56px; margin-bottom: 40px; }
+    .footer-brand { font-family: Georgia, serif; font-size: 20px; color: var(--white); margin-bottom: 10px; }
+    .footer p { font-size: 14px; line-height: 1.8; }
+    .footer h5 { color: var(--white); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+    .footer ul { list-style: none; }
+    .footer ul li { margin-bottom: 8px; }
+    .footer ul li a { color: #aaa; text-decoration: none; font-size: 14px; }
+    .footer ul li a:hover { color: var(--white); }
+    .footer-bottom { border-top: 1px solid #222; padding-top: 20px; font-size: 13px; display: flex; justify-content: space-between; }
+    .footer-bottom a { color: #aaa; text-decoration: none; }
+
+    @media (max-width: 900px) {
+      .nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .page-header { padding: 48px 20px 36px; }
+      .page-header h1 { font-size: 36px; }
+      .filter-bar { padding: 0 12px; }
+      .menu-body { padding: 36px 20px; }
+      .items-grid { grid-template-columns: 1fr 1fr; }
+      .footer { padding: 40px 20px 20px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; gap: 8px; }
+    }
+    @media (max-width: 520px) {
+      .items-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-brand">🍜 Darjeeling Fast Food</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="menu.html" class="active">Menu</a></li>
+    <li><a href="booking.html">Book a Table</a></li>
+    <li><a href="about.html">About & Contact</a></li>
+  </ul>
+  <a href="booking.html" class="nav-cta">Reserve a Seat</a>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <div class="eyebrow">What we serve</div>
+    <h1>Our Menu</h1>
+    <p>Everything made fresh in our kitchen. Prices are all-inclusive, no hidden charges.</p>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <div class="filter-inner">
+    <button class="filter-btn active" data-cat="all">All Items</button>
+    <button class="filter-btn" data-cat="snacks">Snacks</button>
+    <button class="filter-btn" data-cat="mains">Mains</button>
+    <button class="filter-btn" data-cat="chinese">Chinese</button>
+    <button class="filter-btn" data-cat="rolls">Rolls</button>
+    <button class="filter-btn" data-cat="drinks">Drinks</button>
+    <div class="type-toggle">
+      <button class="type-btn" id="vegBtn" onclick="toggleType('veg')">🟢 Veg</button>
+      <button class="type-btn" id="nonvegBtn" onclick="toggleType('nonveg')">🔴 Non-veg</button>
+    </div>
+  </div>
+</div>
+
+<div class="menu-body">
+  <div class="container" id="menuContainer"></div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">🍜 Darjeeling Fast Food</div>
+        <p>Your everyday neighbourhood restaurant in Haripur Kalan. Good food, honest prices, no nonsense.</p>
+      </div>
+      <div>
+        <h5>Pages</h5>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="booking.html">Book a Table</a></li>
+          <li><a href="about.html">About & Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="tel:+919876543210">+91 98765 43210</a></li>
+          <li><a>Haripur Kalan, Haridwar</a></li>
+          <li><a>Uttarakhand – 249 401</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Darjeeling Fast Food</span>
+      <a href="admin.html">Staff Login</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const defaultMenu = [
+    { id:1, name:"Veg Momos", desc:"Steamed dumplings with spicy red chutney", price:60, cat:"snacks", type:"veg", available:true },
+    { id:2, name:"Chicken Momos", desc:"Juicy chicken-filled steamed momos", price:80, cat:"snacks", type:"nonveg", available:true },
+    { id:3, name:"Paneer Roll", desc:"Crispy roti with paneer masala filling", price:70, cat:"rolls", type:"veg", available:true },
+    { id:4, name:"Egg Roll", desc:"Egg omelette roll with onion & chilli", price:50, cat:"rolls", type:"nonveg", available:true },
+    { id:5, name:"Chicken Roll", desc:"Shredded chicken in a soft roll", price:80, cat:"rolls", type:"nonveg", available:true },
+    { id:6, name:"Veg Fried Rice", desc:"Chinese style rice with vegetables", price:90, cat:"chinese", type:"veg", available:true },
+    { id:7, name:"Chicken Fried Rice", desc:"Rice tossed with egg & chicken", price:120, cat:"chinese", type:"nonveg", available:true },
+    { id:8, name:"Veg Noodles", desc:"Hakka noodles with crunchy veggies", price:90, cat:"chinese", type:"veg", available:true },
+    { id:9, name:"Chicken Noodles", desc:"Spicy noodles with chicken pieces", price:120, cat:"chinese", type:"nonveg", available:true },
+    { id:10, name:"Thali (Veg)", desc:"Rice, dal, 2 sabzi, salad & roti", price:130, cat:"mains", type:"veg", available:true },
+    { id:11, name:"Chicken Curry + Rice", desc:"Homestyle chicken curry with rice", price:160, cat:"mains", type:"nonveg", available:true },
+    { id:12, name:"Masala Chai", desc:"Darjeeling special masala tea", price:20, cat:"drinks", type:"veg", available:true },
+    { id:13, name:"Cold Drink", desc:"Chilled Pepsi or Sprite – 250ml", price:30, cat:"drinks", type:"veg", available:true },
+    { id:14, name:"Lassi", desc:"Sweet thick lassi", price:40, cat:"drinks", type:"veg", available:true },
+    { id:15, name:"Bread Pakora", desc:"Stuffed bread fritters with mint chutney", price:40, cat:"snacks", type:"veg", available:true },
+    { id:16, name:"Mix Veg Noodles", desc:"Noodles with seasonal vegetables", price:90, cat:"chinese", type:"veg", available:true },
+    { id:17, name:"Egg Fried Rice", desc:"Rice tossed with scrambled egg", price:100, cat:"chinese", type:"nonveg", available:true },
+    { id:18, name:"Aloo Matar Roll", desc:"Soft roll with spiced peas and potato", price:50, cat:"rolls", type:"veg", available:true },
+  ];
+
+  const cats = { all:'All', snacks:'Snacks', mains:'Mains', chinese:'Chinese', rolls:'Rolls', drinks:'Drinks' };
+  const catOrder = ['snacks','rolls','chinese','mains','drinks'];
+
+  let activeCat = 'all';
+  let activeType = null;
+
+  function getMenu() {
+    const s = localStorage.getItem('dff_menu');
+    return s ? JSON.parse(s) : defaultMenu;
+  }
+
+  function toggleType(t) {
+    if (activeType === t) activeType = null;
+    else activeType = t;
+    document.getElementById('vegBtn').className = 'type-btn' + (activeType==='veg' ? ' veg-active' : '');
+    document.getElementById('nonvegBtn').className = 'type-btn' + (activeType==='nonveg' ? ' nonveg-active' : '');
+    renderMenu();
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      activeCat = this.dataset.cat;
+      renderMenu();
+    });
+  });
+
+  function renderMenu() {
+    let items = getMenu();
+    if (activeType) items = items.filter(i => i.type === activeType);
+
+    const container = document.getElementById('menuContainer');
+    container.innerHTML = '';
+
+    const sectionsToShow = activeCat === 'all' ? catOrder : [activeCat];
+    let totalShown = 0;
+
+    sectionsToShow.forEach(cat => {
+      const catItems = items.filter(i => i.cat === cat);
+      if (catItems.length === 0) return;
+      totalShown += catItems.length;
+
+      const sec = document.createElement('div');
+      sec.className = 'cat-section';
+      sec.innerHTML = `
+        <div class="cat-header">
+          <h2>${cats[cat]}</h2>
+          <span>${catItems.length} item${catItems.length!==1?'s':''}</span>
+        </div>
+        <div class="items-grid">
+          ${catItems.map(item => `
+            <div class="item-card ${!item.available?'item-unavail':''}">
+              <div class="item-top">
+                <div class="item-name">${item.name}</div>
+                <div class="veg-dot ${item.type}"></div>
+              </div>
+              <div class="item-desc">${item.desc}</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                <div class="item-price">₹${item.price}</div>
+                ${!item.available ? '<span class="unavail-badge">Not available</span>' : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      container.appendChild(sec);
+    });
+
+    if (totalShown === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">🍽️</div>
+          <p>No items found in this category right now.</p>
+        </div>
+      `;
+    }
+  }
+
+  renderMenu();
+</script>
+</body>
+</html>
