@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Darjeeling Fast Food — Haripur Kalan, Haridwar</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #FAFAF8; --bg-alt: #F0EBE1; --text: #1A1A1A;
+      --muted: #666; --red: #D63031; --red-dark: #B52828;
+      --green: #27AE60; --border: #E0D9CF; --white: #fff;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    /* NAV */
+    .nav {
+      background: var(--white); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 200;
+      padding: 0 56px; display: flex; align-items: center; justify-content: space-between; height: 66px;
+    }
+    .nav-brand { font-family: Georgia, serif; font-size: 19px; font-weight: bold; color: var(--red); text-decoration: none; }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 15px; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--red); }
+    .nav-cta { background: var(--red); color: var(--white); padding: 9px 22px; border-radius: 6px; font-size: 14px; text-decoration: none; font-weight: 600; }
+    .nav-cta:hover { background: var(--red-dark); }
+
+    /* HERO */
+    .hero {
+      min-height: 88vh;
+      background: #1A1A1A;
+      display: flex; align-items: center;
+      padding: 80px 56px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(214,48,49,0.18) 0%, transparent 65%);
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 640px; }
+    .hero-eyebrow {
+      font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--red); font-weight: 700; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-eyebrow::before { content: ''; display: block; width: 32px; height: 2px; background: var(--red); }
+    .hero h1 {
+      font-family: Georgia, serif; font-size: 60px; line-height: 1.1;
+      color: var(--white); margin-bottom: 22px; letter-spacing: -1px;
+    }
+    .hero h1 em { color: var(--red); font-style: normal; }
+    .hero p { font-size: 18px; color: #bbb; line-height: 1.7; margin-bottom: 36px; max-width: 480px; }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn { display: inline-block; padding: 14px 30px; border-radius: 6px; font-size: 15px; font-weight: 600; text-decoration: none; cursor: pointer; border: none; transition: all 0.15s; }
+    .btn-red { background: var(--red); color: var(--white); }
+    .btn-red:hover { background: var(--red-dark); }
+    .btn-ghost { background: transparent; color: #ccc; border: 1.5px solid #444; }
+    .btn-ghost:hover { border-color: #aaa; color: var(--white); }
+
+    .hero-badges {
+      position: absolute; right: 56px; bottom: 48px;
+      display: flex; flex-direction: column; gap: 12px; align-items: flex-end;
+      z-index: 1;
+    }
+    .badge-pill {
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      color: #ccc; padding: 8px 18px; border-radius: 999px; font-size: 13px;
+    }
+
+    /* STRIP */
+    .strip {
+      background: var(--red); padding: 18px 56px;
+      display: flex; gap: 56px; align-items: center; overflow-x: auto;
+    }
+    .strip-item { white-space: nowrap; color: var(--white); font-size: 14px; font-weight: 500; }
+    .strip-item span { opacity: 0.6; margin-right: 6px; }
+
+    /* SECTION */
+    .sec { padding: 96px 56px; }
+    .sec-alt { background: var(--bg-alt); }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .sec-label { font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--red); font-weight: 700; margin-bottom: 10px; }
+    .sec-title { font-family: Georgia, serif; font-size: 38px; line-height: 1.2; color: var(--text); margin-bottom: 14px; }
+    .sec-sub { font-size: 16px; color: var(--muted); max-width: 480px; }
+    .sec-head { margin-bottom: 56px; }
+
+    /* WHY US */
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .why-card {
+      border: 1px solid var(--border); border-radius: 10px; padding: 32px;
+      background: var(--white);
+    }
+    .why-icon { font-size: 32px; margin-bottom: 16px; }
+    .why-card h3 { font-size: 18px; font-family: Georgia, serif; margin-bottom: 8px; }
+    .why-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* FEATURED MENU */
+    .menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .menu-card {
+      background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+      padding: 24px; transition: box-shadow 0.15s;
+    }
+    .menu-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .menu-tag {
+      font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
+    }
+    .tag-veg { color: var(--green); }
+    .tag-nonveg { color: var(--red); }
+    .menu-card h4 { font-size: 17px; font-family: Georgia, serif; margin-bottom: 6px; }
+    .menu-card p { font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
+    .menu-price { font-size: 20px; font-weight: 700; color: var(--red); }
+    .menu-price span { font-size: 13px; font-weight: 400; color: var(--muted); }
+
+    /* BOOKING TEASER */
+    .booking-teaser {
+      background: #1A1A1A; border-radius: 12px;
+      padding: 64px 56px; display: flex; align-items: center; justify-content: space-between; gap: 40px;
+    }
+    .booking-teaser h2 { font-family: Georgia, serif; font-size: 36px; color: var(--white); margin-bottom: 12px; }
+    .booking-teaser p { font-size: 16px; color: #aaa; max-width: 400px; }
+    .booking-teaser .right { flex-shrink: 0; text-align: center; }
+    .booking-teaser .seat-count { font-family: Georgia, serif; font-size: 64px; color: var(--red); line-height: 1; }
+    .booking-teaser .seat-label { font-size: 13px; color: #666; margin-top: 4px; }
+
+    /* HOURS */
+    .hours-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+    .hours-table { width: 100%; }
+    .hours-table tr td { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
+    .hours-table tr td:last-child { text-align: right; color: var(--red); font-weight: 600; }
+    .hours-table tr:last-child td { border-bottom: none; }
+    .map-placeholder {
+      background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px;
+      padding: 40px; text-align: center; height: 280px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    }
+    .map-placeholder .map-icon { font-size: 48px; }
+    .map-placeholder h4 { font-size: 16px; color: var(--text); }
+    .map-placeholder p { font-size: 14px; color: var(--muted); }
+
+    /* FOOTER */
+    .footer { background: #111; color: #aaa; padding: 64px 56px 32px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 56px; margin-bottom: 48px; }
+    .footer-brand { font-family: Georgia, serif; font-size: 22px; color: var(--white); margin-bottom: 12px; }
+    .footer p { font-size: 14px; line-height: 1.8; }
+    .footer h5 { color: var(--white); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .footer ul { list-style: none; }
+    .footer ul li { margin-bottom: 10px; }
+    .footer ul li a { color: #aaa; text-decoration: none; font-size: 14px; }
+    .footer ul li a:hover { color: var(--white); }
+    .footer-bottom { border-top: 1px solid #2a2a2a; padding-top: 24px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-bottom a { color: #aaa; text-decoration: none; }
+    .footer-bottom a:hover { color: var(--white); }
+
+    @media (max-width: 900px) {
+      .nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 60px 24px; min-height: auto; padding-bottom: 80px; }
+      .hero h1 { font-size: 38px; }
+      .hero-badges { display: none; }
+      .strip { padding: 16px 24px; gap: 32px; }
+      .sec { padding: 64px 24px; }
+      .why-grid { grid-template-columns: 1fr; }
+      .menu-grid { grid-template-columns: 1fr 1fr; }
+      .booking-teaser { padding: 40px 28px; flex-direction: column; gap: 24px; }
+      .hours-grid { grid-template-columns: 1fr; }
+      .footer { padding: 48px 24px 24px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; gap: 10px; }
+    }
+    @media (max-width: 520px) {
+      .menu-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-brand">🍜 Darjeeling Fast Food</a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="booking.html">Book a Table</a></li>
+    <li><a href="about.html">About & Contact</a></li>
+  </ul>
+  <a href="booking.html" class="nav-cta">Reserve a Seat</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Haripur Kalan, Haridwar</div>
+    <h1>Good food.<br><em>No fuss.</em><br>Every day.</h1>
+    <p>Hot momos, rolls, Chinese, and thalis — made fresh and served fast. Your neighbourhood spot for a proper meal.</p>
+    <div class="hero-btns">
+      <a href="menu.html" class="btn btn-red">See Our Menu</a>
+      <a href="booking.html" class="btn btn-ghost">Book a Table</a>
+    </div>
+  </div>
+  <div class="hero-badges">
+    <div class="badge-pill">🕐 Open 11 AM – 10 PM</div>
+    <div class="badge-pill">🪑 20 seats available</div>
+    <div class="badge-pill">📞 +91 98765 43210</div>
+  </div>
+</section>
+
+<!-- INFO STRIP -->
+<div class="strip">
+  <div class="strip-item"><span>📍</span> Haripur Kalan, Haridwar, Uttarakhand</div>
+  <div class="strip-item"><span>🕐</span> Open daily 11 AM – 10 PM</div>
+  <div class="strip-item"><span>📞</span> +91 98765 43210</div>
+  <div class="strip-item"><span>🪑</span> Dine in · Takeaway</div>
+</div>
+
+<!-- WHY US -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-label">Why people come back</div>
+      <h2 class="sec-title">Fast, fresh, and honest food</h2>
+      <p class="sec-sub">No waiting forever. No fancy bill. Just food that hits the spot.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">🥟</div>
+        <h3>Made fresh daily</h3>
+        <p>Every momo, every roll, every bowl of noodles — prepared in our kitchen the same morning. No reheating, no shortcuts.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">⚡</div>
+        <h3>Actually fast</h3>
+        <p>Fast food means fast. Your order is on the table in under 15 minutes. We respect your time as much as we respect your hunger.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">💰</div>
+        <h3>Fair prices, always</h3>
+        <p>From ₹20 chai to a full thali at ₹130 — good food at prices that make sense for the people of Haridwar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED MENU -->
+<section class="sec sec-alt">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-label">What we're known for</div>
+      <h2 class="sec-title">A few favourites</h2>
+      <p class="sec-sub">From the steamer to your plate — these are the dishes people order again and again.</p>
+    </div>
+    <div class="menu-grid" id="featuredGrid"></div>
+    <div style="margin-top: 40px;">
+      <a href="menu.html" class="btn btn-red">See Full Menu</a>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING TEASER -->
+<section class="sec">
+  <div class="container">
+    <div class="booking-teaser">
+      <div>
+        <h2>Planning to come in?<br>Book your seat first.</h2>
+        <p style="margin: 14px 0 28px;">Tell us when you're coming and how many people, and we'll have your table ready. No phone tag, no waiting at the door.</p>
+        <a href="booking.html" class="btn btn-red">Reserve a Table</a>
+      </div>
+      <div class="right">
+        <div class="seat-count" id="seatDisplay">20</div>
+        <div class="seat-label">seats in the restaurant</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOURS + LOCATION -->
+<section class="sec sec-alt">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-label">Find us</div>
+      <h2 class="sec-title">Hours & Location</h2>
+    </div>
+    <div class="hours-grid">
+      <div>
+        <table class="hours-table">
+          <tr><td>Monday – Friday</td><td>11:00 AM – 10:00 PM</td></tr>
+          <tr><td>Saturday</td><td>10:00 AM – 10:30 PM</td></tr>
+          <tr><td>Sunday</td><td>10:00 AM – 10:00 PM</td></tr>
+          <tr><td>Holidays</td><td>11:00 AM – 9:00 PM</td></tr>
+        </table>
+        <div style="margin-top: 32px; font-size: 14px; color: var(--muted); line-height: 1.9;">
+          <div>📍 Haripur Kalan, Haridwar, Uttarakhand</div>
+          <div>📞 +91 98765 43210</div>
+          <div>🚗 Near the main chowk, opposite the old peepal tree</div>
+        </div>
+      </div>
+      <div class="map-placeholder">
+        <div class="map-icon">📍</div>
+        <h4>Darjeeling Fast Food</h4>
+        <p>Haripur Kalan, Haridwar<br>Uttarakhand – 249 401</p>
+        <a href="about.html" style="margin-top:16px; color: var(--red); font-size:14px; font-weight:600; text-decoration:none;">Get Directions →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">🍜 Darjeeling Fast Food</div>
+        <p>Your everyday neighbourhood restaurant in Haripur Kalan. Good food, honest prices, no nonsense.</p>
+        <p style="margin-top:12px; color:#555;">Open 11 AM – 10 PM · All Days</p>
+      </div>
+      <div>
+        <h5>Pages</h5>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="booking.html">Book a Table</a></li>
+          <li><a href="about.html">About & Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="tel:+919876543210">+91 98765 43210</a></li>
+          <li><a href="#">Haripur Kalan, Haridwar</a></li>
+          <li><a href="#">Uttarakhand – 249 401</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Darjeeling Fast Food. All rights reserved.</span>
+      <a href="admin.html">Staff Login</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const defaultMenu = [
+    { id:1, name:"Veg Momos", desc:"Steamed dumplings with spicy chutney", price:60, cat:"snacks", type:"veg", available:true },
+    { id:2, name:"Chicken Momos", desc:"Juicy chicken-filled steamed momos", price:80, cat:"snacks", type:"nonveg", available:true },
+    { id:3, name:"Paneer Roll", desc:"Crispy roti with paneer masala filling", price:70, cat:"rolls", type:"veg", available:true },
+    { id:4, name:"Egg Roll", desc:"Egg omelette roll with onion & chilli", price:50, cat:"rolls", type:"nonveg", available:true },
+    { id:5, name:"Chicken Roll", desc:"Shredded chicken in a soft roll", price:80, cat:"rolls", type:"nonveg", available:true },
+    { id:6, name:"Veg Fried Rice", desc:"Chinese style rice with vegetables", price:90, cat:"chinese", type:"veg", available:true },
+    { id:7, name:"Chicken Fried Rice", desc:"Rice tossed with egg & chicken", price:120, cat:"chinese", type:"nonveg", available:true },
+    { id:8, name:"Veg Noodles", desc:"Hakka noodles with crunchy veggies", price:90, cat:"chinese", type:"veg", available:true },
+    { id:9, name:"Chicken Noodles", desc:"Spicy noodles with chicken pieces", price:120, cat:"chinese", type:"nonveg", available:true },
+    { id:10, name:"Thali (Veg)", desc:"Rice, dal, 2 sabzi, salad & roti", price:130, cat:"mains", type:"veg", available:true },
+    { id:11, name:"Chicken Curry + Rice", desc:"Homestyle chicken curry with rice", price:160, cat:"mains", type:"nonveg", available:true },
+    { id:12, name:"Masala Chai", desc:"Darjeeling special masala tea", price:20, cat:"drinks", type:"veg", available:true },
+    { id:13, name:"Cold Drink", desc:"Chilled Pepsi or Sprite – 250ml", price:30, cat:"drinks", type:"veg", available:true },
+    { id:14, name:"Lassi", desc:"Sweet thick lassi", price:40, cat:"drinks", type:"veg", available:true },
+    { id:15, name:"Bread Pakora", desc:"Stuffed bread fritters with chutney", price:40, cat:"snacks", type:"veg", available:true },
+  ];
+
+  function getMenu() {
+    const s = localStorage.getItem('dff_menu');
+    return s ? JSON.parse(s) : defaultMenu;
+  }
+
+  function getSeats() {
+    const s = localStorage.getItem('dff_seats');
+    if (s) return JSON.parse(s);
+    const seats = {}; for (let i=1;i<=20;i++) seats[i]=null;
+    return seats;
+  }
+
+  // Featured: pick 8 items
+  const featured = [1,2,3,7,8,10,11,12];
+  const menu = getMenu().filter(i => featured.includes(i.id) && i.available);
+  const grid = document.getElementById('featuredGrid');
+  menu.slice(0,8).forEach(item => {
+    grid.innerHTML += `
+      <div class="menu-card">
+        <div class="menu-tag ${item.type==='veg'?'tag-veg':'tag-nonveg'}">
+          ${item.type==='veg'?'●':'●'} ${item.type==='veg'?'Veg':'Non-veg'}
+        </div>
+        <h4>${item.name}</h4>
+        <p>${item.desc}</p>
+        <div class="menu-price">₹${item.price} <span>onwards</span></div>
+      </div>
+    `;
+  });
+
+  // Seats
+  const seats = getSeats();
+  const booked = Object.values(seats).filter(v=>v!==null).length;
+  document.getElementById('seatDisplay').textContent = 20 - booked;
+</script>
+</body>
+</html>
