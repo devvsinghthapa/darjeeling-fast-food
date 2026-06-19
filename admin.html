@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Darjeeling Fast Food</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #F5F5F3; --text: #1A1A1A; --muted: #666;
+      --red: #D63031; --red-dark: #B52828; --green: #27AE60;
+      --border: #E0D9CF; --white: #fff; --sidebar: #1A1A1A;
+    }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+
+    /* LOGIN */
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #1A1A1A; }
+    .login-card { background: var(--white); border-radius: 12px; padding: 48px 40px; width: 380px; }
+    .login-card .logo { font-family: Georgia, serif; font-size: 22px; color: var(--red); margin-bottom: 6px; }
+    .login-card .sub { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+    .login-field { margin-bottom: 16px; }
+    .login-field label { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; color: var(--muted); }
+    .login-field input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 7px; font-size: 15px; transition: border-color 0.15s; }
+    .login-field input:focus { outline: none; border-color: var(--red); }
+    .login-btn { width: 100%; background: var(--red); color: var(--white); border: none; padding: 13px; border-radius: 7px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+    .login-btn:hover { background: var(--red-dark); }
+    .login-err { color: var(--red); font-size: 13px; margin-top: 10px; display: none; }
+    .login-hint { font-size: 12px; color: #bbb; margin-top: 16px; text-align: center; }
+
+    /* ADMIN LAYOUT */
+    .admin-layout { display: none; min-height: 100vh; }
+    .sidebar {
+      width: 220px; background: var(--sidebar); position: fixed; top: 0; left: 0; bottom: 0;
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid #2a2a2a; }
+    .sidebar-logo .name { font-family: Georgia, serif; font-size: 16px; color: var(--white); margin-bottom: 2px; }
+    .sidebar-logo .role { font-size: 11px; color: #666; }
+    .sidebar-nav { flex: 1; padding: 16px 0; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 20px; color: #888; font-size: 14px; cursor: pointer;
+      transition: all 0.15s; border-left: 3px solid transparent;
+    }
+    .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+    .nav-item.active { color: var(--white); border-left-color: var(--red); background: rgba(214,48,49,0.1); }
+    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid #2a2a2a; }
+    .sidebar-footer a { display: block; font-size: 13px; color: #666; text-decoration: none; margin-bottom: 10px; }
+    .sidebar-footer a:hover { color: var(--white); }
+    .logout-btn { width: 100%; background: transparent; border: 1px solid #333; color: #888; padding: 8px; border-radius: 5px; font-size: 13px; cursor: pointer; }
+    .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+    .main { margin-left: 220px; min-height: 100vh; }
+    .top-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+    .page-title { font-size: 17px; font-weight: 600; }
+    .top-right { font-size: 13px; color: var(--muted); }
+
+    .content-area { padding: 32px; }
+
+    /* PANELS */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* STAT CARDS */
+    .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .stat .n { font-family: Georgia, serif; font-size: 32px; color: var(--red); line-height: 1; }
+    .stat .l { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    /* CARDS */
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 24px; }
+    .card-head { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-head h3 { font-size: 15px; font-weight: 600; }
+    .card-body { padding: 24px; }
+
+    /* TABLE */
+    .tbl { width: 100%; border-collapse: collapse; }
+    .tbl th { background: #f7f7f5; color: var(--muted); font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; padding: 10px 14px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
+    .tbl td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid #f0f0ee; vertical-align: middle; }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl tr:hover td { background: #fafaf8; }
+
+    /* BADGES */
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .b-pending { background: #fff3cd; color: #856404; }
+    .b-confirmed { background: #d1ecf1; color: #0c5460; }
+    .b-done { background: #d4edda; color: #155724; }
+    .b-cancelled { background: #f8d7da; color: #721c24; }
+    .b-veg { background: #e8f5e9; color: var(--green); }
+    .b-nonveg { background: #fdecea; color: var(--red); }
+    .b-on { background: #d4edda; color: #155724; }
+    .b-off { background: #f0f0f0; color: #999; }
+
+    /* BUTTONS */
+    .btn-sm { padding: 5px 12px; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-red { background: var(--red); color: var(--white); }
+    .btn-red:hover { background: var(--red-dark); }
+    .btn-gray { background: #eee; color: #555; }
+    .btn-gray:hover { background: #ddd; }
+    .btn-green { background: var(--green); color: var(--white); }
+    .status-sel { padding: 5px 10px; font-size: 12px; border: 1px solid var(--border); border-radius: 5px; background: var(--bg); cursor: pointer; }
+
+    /* FORM */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .ff { margin-bottom: 0; }
+    .ff label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .ff input, .ff select, .ff textarea { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--bg); font-family: inherit; }
+    .ff input:focus, .ff select:focus { outline: none; border-color: var(--red); background: var(--white); }
+    .ff-full { grid-column: 1 / -1; }
+
+    /* SEAT GRID */
+    .seat-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; max-width: 360px; }
+    .seat-cell { aspect-ratio: 1; border: 2px solid #ddd; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .seat-cell.free { background: #e8f5e9; border-color: var(--green); color: #155724; }
+    .seat-cell.occupied { background: #fdecea; border-color: var(--red); color: #721c24; cursor: default; }
+    .seat-cell .seat-num { font-size: 18px; line-height: 1; }
+    .seat-cell .seat-name { font-size: 9px; color: #999; margin-top: 2px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 54px; }
+
+    .empty-row { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+
+    @media (max-width: 1000px) {
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="logo">🍜 Darjeeling Fast Food</div>
+    <div class="sub">Admin Panel — Staff only</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="uInput" placeholder="admin"/>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="pInput" placeholder="••••••••"/>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="loginErr">Wrong username or password.</div>
+    <div class="login-hint">Default: admin / dff@2025</div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="admin-layout" id="adminWrap">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="name">🍜 Darjeeling FF</div>
+      <div class="role">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-panel="dashboard"><span class="icon">📊</span> Dashboard</div>
+      <div class="nav-item" data-panel="bookings"><span class="icon">📅</span> Bookings</div>
+      <div class="nav-item" data-panel="seats"><span class="icon">🪑</span> Seat Map</div>
+      <div class="nav-item" data-panel="menu"><span class="icon">🍽️</span> Menu</div>
+      <div class="nav-item" data-panel="additem"><span class="icon">➕</span> Add Item</div>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html">← View Website</a>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="top-bar">
+      <div class="page-title" id="pageTitle">Dashboard</div>
+      <div class="top-right" id="topRight">Today: <span id="todayDate"></span></div>
+    </div>
+    <div class="content-area">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="stats-row" id="statsRow"></div>
+        <div class="card">
+          <div class="card-head"><h3>Today's Bookings</h3></div>
+          <div class="card-body" id="todayBookings"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>All Recent Bookings</h3></div>
+          <div class="card-body" id="recentBookings"></div>
+        </div>
+      </div>
+
+      <!-- BOOKINGS -->
+      <div class="panel" id="panel-bookings">
+        <div class="card">
+          <div class="card-head">
+            <h3>All Bookings</h3>
+            <div style="display:flex;gap:10px;">
+              <select id="filterStatus" class="status-sel" onchange="renderBookings()">
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="done">Done</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <button class="btn-sm btn-gray" onclick="clearFinished()">Clear Done/Cancelled</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;" id="bookingsTable"></div>
+        </div>
+      </div>
+
+      <!-- SEATS -->
+      <div class="panel" id="panel-seats">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start;">
+          <div class="card">
+            <div class="card-head"><h3>Seat Map</h3></div>
+            <div class="card-body">
+              <div style="display:flex;gap:16px;margin-bottom:18px;font-size:12px;">
+                <span style="color:var(--green);font-weight:700;">● Free</span>
+                <span style="color:var(--red);font-weight:700;">● Occupied</span>
+              </div>
+              <div class="seat-map" id="seatMap"></div>
+              <div style="margin-top:18px;font-size:13px;color:var(--muted);" id="seatStats"></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-head"><h3>Assign Seat</h3></div>
+              <div class="card-body">
+                <div class="ff" style="margin-bottom:14px;">
+                  <label>Select Booking</label>
+                  <select id="assignBooking"></select>
+                </div>
+                <div class="ff" style="margin-bottom:14px;">
+                  <label>Select Free Seat</label>
+                  <select id="assignSeat"></select>
+                </div>
+                <button class="btn-sm btn-red" style="padding:9px 20px;font-size:13px;" onclick="assignSeat()">Assign Seat</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Free a Seat</h3></div>
+              <div class="card-body">
+                <div class="ff" style="margin-bottom:14px;">
+                  <label>Select Occupied Seat</label>
+                  <select id="freeSeatSel"></select>
+                </div>
+                <button class="btn-sm btn-gray" style="padding:9px 20px;font-size:13px;" onclick="freeSeatAction()">Free Seat</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MENU -->
+      <div class="panel" id="panel-menu">
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <select id="menuFilter" class="status-sel" onchange="renderMenuAdmin()">
+            <option value="all">All Categories</option>
+            <option value="snacks">Snacks</option>
+            <option value="mains">Mains</option>
+            <option value="chinese">Chinese</option>
+            <option value="rolls">Rolls</option>
+            <option value="drinks">Drinks</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Menu Items</h3> <span id="menuCount" style="font-size:13px;color:var(--muted);"></span></div>
+          <div class="card-body" style="padding:0;" id="menuAdminTable"></div>
+        </div>
+      </div>
+
+      <!-- ADD ITEM -->
+      <div class="panel" id="panel-additem">
+        <div class="card" style="max-width:580px;">
+          <div class="card-head"><h3>Add New Menu Item</h3></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="ff">
+                <label>Item Name *</label>
+                <input type="text" id="mName" placeholder="e.g. Paneer Tikka"/>
+              </div>
+              <div class="ff">
+                <label>Price (₹) *</label>
+                <input type="number" id="mPrice" placeholder="e.g. 100"/>
+              </div>
+              <div class="ff ff-full">
+                <label>Description *</label>
+                <input type="text" id="mDesc" placeholder="Short description of the item"/>
+              </div>
+              <div class="ff">
+                <label>Category *</label>
+                <select id="mCat">
+                  <option value="snacks">Snacks</option>
+                  <option value="mains">Mains</option>
+                  <option value="chinese">Chinese</option>
+                  <option value="rolls">Rolls</option>
+                  <option value="drinks">Drinks</option>
+                </select>
+              </div>
+              <div class="ff">
+                <label>Type *</label>
+                <select id="mType">
+                  <option value="veg">Veg</option>
+                  <option value="nonveg">Non-Veg</option>
+                </select>
+              </div>
+              <div class="ff ff-full" style="margin-top:8px;">
+                <button class="btn-sm btn-red" style="padding:11px 28px;font-size:14px;" onclick="addItem()">Add to Menu</button>
+              </div>
+            </div>
+            <div id="addSuccess" style="display:none;margin-top:16px;padding:12px;background:#f0fdf4;border:1px solid var(--green);border-radius:6px;font-size:14px;color:#155724;">✅ Item added to the menu!</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const ADMIN = 'admin', PASS = 'dff@2025';
+  const TOTAL = 20;
+
+  const defaultMenu = [
+    { id:1, name:"Veg Momos", desc:"Steamed dumplings with spicy chutney", price:60, cat:"snacks", type:"veg", available:true },
+    { id:2, name:"Chicken Momos", desc:"Juicy chicken-filled steamed momos", price:80, cat:"snacks", type:"nonveg", available:true },
+    { id:3, name:"Paneer Roll", desc:"Crispy roti with paneer masala filling", price:70, cat:"rolls", type:"veg", available:true },
+    { id:4, name:"Egg Roll", desc:"Egg omelette roll with onion & chilli", price:50, cat:"rolls", type:"nonveg", available:true },
+    { id:5, name:"Chicken Roll", desc:"Shredded chicken in a soft roll", price:80, cat:"rolls", type:"nonveg", available:true },
+    { id:6, name:"Veg Fried Rice", desc:"Chinese style rice with vegetables", price:90, cat:"chinese", type:"veg", available:true },
+    { id:7, name:"Chicken Fried Rice", desc:"Rice tossed with egg & chicken", price:120, cat:"chinese", type:"nonveg", available:true },
+    { id:8, name:"Veg Noodles", desc:"Hakka noodles with crunchy veggies", price:90, cat:"chinese", type:"veg", available:true },
+    { id:9, name:"Chicken Noodles", desc:"Spicy noodles with chicken pieces", price:120, cat:"chinese", type:"nonveg", available:true },
+    { id:10, name:"Thali (Veg)", desc:"Rice, dal, 2 sabzi, salad & roti", price:130, cat:"mains", type:"veg", available:true },
+    { id:11, name:"Chicken Curry + Rice", desc:"Homestyle chicken curry with rice", price:160, cat:"mains", type:"nonveg", available:true },
+    { id:12, name:"Masala Chai", desc:"Darjeeling special masala tea", price:20, cat:"drinks", type:"veg", available:true },
+    { id:13, name:"Cold Drink", desc:"Chilled Pepsi or Sprite – 250ml", price:30, cat:"drinks", type:"veg", available:true },
+    { id:14, name:"Lassi", desc:"Sweet thick lassi", price:40, cat:"drinks", type:"veg", available:true },
+    { id:15, name:"Bread Pakora", desc:"Stuffed bread fritters with mint chutney", price:40, cat:"snacks", type:"veg", available:true },
+  ];
+
+  function getMenu() { const s = localStorage.getItem('dff_menu'); return s ? JSON.parse(s) : defaultMenu; }
+  function saveMenu(m) { localStorage.setItem('dff_menu', JSON.stringify(m)); }
+  function getBookings() { return JSON.parse(localStorage.getItem('dff_bookings')||'[]'); }
+  function saveBookings(b) { localStorage.setItem('dff_bookings', JSON.stringify(b)); }
+  function getSeats() {
+    const s = localStorage.getItem('dff_seats');
+    if (s) return JSON.parse(s);
+    const seats = {}; for(let i=1;i<=TOTAL;i++) seats[i]=null; return seats;
+  }
+  function saveSeats(s) { localStorage.setItem('dff_seats', JSON.stringify(s)); }
+
+  // AUTH
+  document.getElementById('pInput').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  function doLogin() {
+    const u = document.getElementById('uInput').value.trim();
+    const p = document.getElementById('pInput').value.trim();
+    if (u===ADMIN && p===PASS) {
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('adminWrap').style.display = 'flex';
+      document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+      renderDashboard();
+    } else {
+      document.getElementById('loginErr').style.display = 'block';
+    }
+  }
+  function doLogout() {
+    document.getElementById('loginWrap').style.display = 'flex';
+    document.getElementById('adminWrap').style.display = 'none';
+  }
+
+  // NAV
+  const panelNames = { dashboard:'Dashboard', bookings:'Bookings', seats:'Seat Map', menu:'Menu', additem:'Add Menu Item' };
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      this.classList.add('active');
+      const key = this.dataset.panel;
+      document.getElementById('panel-'+key).classList.add('active');
+      document.getElementById('pageTitle').textContent = panelNames[key];
+      if(key==='dashboard') renderDashboard();
+      if(key==='bookings') renderBookings();
+      if(key==='seats') renderSeats();
+      if(key==='menu') renderMenuAdmin();
+    });
+  });
+
+  // DASHBOARD
+  function renderDashboard() {
+    const bookings = getBookings();
+    const menu = getMenu();
+    const seats = getSeats();
+    const occupied = Object.values(seats).filter(v=>v!==null).length;
+    const today = new Date().toISOString().split('T')[0];
+
+    document.getElementById('statsRow').innerHTML = `
+      <div class="stat"><div class="n">${bookings.filter(b=>b.status==='pending').length}</div><div class="l">Pending Bookings</div></div>
+      <div class="stat"><div class="n">${bookings.filter(b=>b.status==='confirmed').length}</div><div class="l">Confirmed</div></div>
+      <div class="stat"><div class="n">${bookings.filter(b=>b.date===today).length}</div><div class="l">Today's Bookings</div></div>
+      <div class="stat"><div class="n">${occupied} / ${TOTAL}</div><div class="l">Seats Occupied</div></div>
+      <div class="stat"><div class="n">${menu.filter(i=>i.available).length}</div><div class="l">Menu Items Active</div></div>
+    `;
+
+    const todayB = bookings.filter(b=>b.date===today);
+    const todayEl = document.getElementById('todayBookings');
+    if (todayB.length===0) { todayEl.innerHTML='<div class="empty-row">No bookings for today.</div>'; }
+    else todayEl.innerHTML = bookingTableHTML(todayB);
+
+    const recent = [...bookings].reverse().slice(0,8);
+    const recentEl = document.getElementById('recentBookings');
+    if (recent.length===0) { recentEl.innerHTML='<div class="empty-row">No bookings yet.</div>'; }
+    else recentEl.innerHTML = bookingTableHTML(recent);
+  }
+
+  function bookingTableHTML(list) {
+    return `<table class="tbl">
+      <thead><tr><th>Name</th><th>Phone</th><th>Date</th><th>Time</th><th>Guests</th><th>Seat</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        ${list.map(b=>`
+          <tr>
+            <td style="font-weight:600;">${b.name}</td>
+            <td>${b.phone}</td>
+            <td>${b.date}</td>
+            <td>${b.time}</td>
+            <td>${b.guests}</td>
+            <td>${b.seat ? `Seat ${b.seat}` : '—'}</td>
+            <td>
+              <select class="status-sel" onchange="changeStatus(${b.id},this.value)">
+                <option ${b.status==='pending'?'selected':''} value="pending">Pending</option>
+                <option ${b.status==='confirmed'?'selected':''} value="confirmed">Confirmed</option>
+                <option ${b.status==='done'?'selected':''} value="done">Done</option>
+                <option ${b.status==='cancelled'?'selected':''} value="cancelled">Cancelled</option>
+              </select>
+            </td>
+            <td><button class="btn-sm btn-gray" onclick="deleteBooking(${b.id})">Delete</button></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>`;
+  }
+
+  // BOOKINGS
+  function renderBookings() {
+    const filter = document.getElementById('filterStatus').value;
+    let b = getBookings();
+    if (filter!=='all') b = b.filter(x=>x.status===filter);
+    b = [...b].reverse();
+    const el = document.getElementById('bookingsTable');
+    if (b.length===0) { el.innerHTML='<div class="empty-row">No bookings found.</div>'; return; }
+    el.innerHTML = bookingTableHTML(b);
+  }
+
+  function changeStatus(id, status) {
+    const b = getBookings().map(x=>x.id===id?{...x,status}:x);
+    saveBookings(b);
+    if(document.getElementById('panel-dashboard').classList.contains('active')) renderDashboard();
+  }
+
+  function deleteBooking(id) {
+    if(!confirm('Delete this booking?')) return;
+    saveBookings(getBookings().filter(b=>b.id!==id));
+    if(document.getElementById('panel-bookings').classList.contains('active')) renderBookings();
+    else renderDashboard();
+  }
+
+  function clearFinished() {
+    if(!confirm('Remove all Done and Cancelled bookings?')) return;
+    saveBookings(getBookings().filter(b=>b.status!=='done'&&b.status!=='cancelled'));
+    renderBookings();
+  }
+
+  // SEATS
+  function renderSeats() {
+    const seats = getSeats();
+    const bookings = getBookings().filter(b=>b.status==='pending'||b.status==='confirmed');
+    const occupied = Object.values(seats).filter(v=>v!==null).length;
+
+    let html = '';
+    for(let i=1;i<=TOTAL;i++) {
+      const occ = seats[i];
+      html += `<div class="seat-cell ${occ?'occupied':'free'}">
+        <div class="seat-num">${i}</div>
+        <div class="seat-name">${occ||'Free'}</div>
+      </div>`;
+    }
+    document.getElementById('seatMap').innerHTML = html;
+    document.getElementById('seatStats').textContent = `${occupied} occupied · ${TOTAL-occupied} free`;
+
+    const bSel = document.getElementById('assignBooking');
+    bSel.innerHTML = '<option value="">Select Booking</option>';
+    bookings.forEach(b => bSel.innerHTML += `<option value="${b.id}">${b.name} — ${b.date} ${b.time}</option>`);
+
+    const sSel = document.getElementById('assignSeat');
+    sSel.innerHTML = '<option value="">Select Seat</option>';
+    for(let i=1;i<=TOTAL;i++) { if(!seats[i]) sSel.innerHTML += `<option value="${i}">Seat ${i}</option>`; }
+
+    const fSel = document.getElementById('freeSeatSel');
+    fSel.innerHTML = '<option value="">Select Seat</option>';
+    for(let i=1;i<=TOTAL;i++) { if(seats[i]) fSel.innerHTML += `<option value="${i}">Seat ${i} — ${seats[i]}</option>`; }
+  }
+
+  function assignSeat() {
+    const bid = parseInt(document.getElementById('assignBooking').value);
+    const snum = parseInt(document.getElementById('assignSeat').value);
+    if(!bid||!snum) { alert('Select a booking and a seat.'); return; }
+    const bookings = getBookings();
+    const booking = bookings.find(b=>b.id===bid);
+    if(!booking) return;
+    const seats = getSeats();
+    if(booking.seat) seats[booking.seat] = null;
+    seats[snum] = booking.name;
+    saveSeats(seats);
+    saveBookings(bookings.map(b=>b.id===bid?{...b,seat:snum,status:'confirmed'}:b));
+    renderSeats();
+    alert(`Seat ${snum} assigned to ${booking.name}.`);
+  }
+
+  function freeSeatAction() {
+    const snum = parseInt(document.getElementById('freeSeatSel').value);
+    if(!snum) { alert('Select a seat.'); return; }
+    const seats = getSeats();
+    if(!confirm(`Free seat ${snum} (${seats[snum]})?`)) return;
+    seats[snum] = null;
+    saveSeats(seats);
+    renderSeats();
+  }
+
+  // MENU
+  function renderMenuAdmin() {
+    const filter = document.getElementById('menuFilter').value;
+    let items = getMenu();
+    if(filter!=='all') items = items.filter(i=>i.cat===filter);
+    document.getElementById('menuCount').textContent = `${items.length} item${items.length!==1?'s':''}`;
+    const el = document.getElementById('menuAdminTable');
+    if(items.length===0) { el.innerHTML='<div class="empty-row">No items found.</div>'; return; }
+    el.innerHTML = `<table class="tbl">
+      <thead><tr><th>Name</th><th>Description</th><th>Category</th><th>Type</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        ${items.map(item=>`
+          <tr>
+            <td style="font-weight:600;">${item.name}</td>
+            <td style="color:var(--muted);max-width:180px;">${item.desc}</td>
+            <td style="text-transform:capitalize;">${item.cat}</td>
+            <td><span class="badge b-${item.type}">${item.type==='veg'?'🟢 Veg':'🔴 Non-veg'}</span></td>
+            <td style="font-weight:700;color:var(--red);">₹${item.price}</td>
+            <td><span class="badge ${item.available?'b-on':'b-off'}">${item.available?'Available':'Off'}</span></td>
+            <td style="display:flex;gap:6px;">
+              <button class="btn-sm ${item.available?'btn-gray':'btn-green'}" onclick="toggleItem(${item.id})">${item.available?'Turn Off':'Turn On'}</button>
+              <button class="btn-sm btn-red" onclick="deleteItem(${item.id})">Delete</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>`;
+  }
+
+  function toggleItem(id) {
+    saveMenu(getMenu().map(i=>i.id===id?{...i,available:!i.available}:i));
+    renderMenuAdmin();
+  }
+
+  function deleteItem(id) {
+    if(!confirm('Delete this menu item permanently?')) return;
+    saveMenu(getMenu().filter(i=>i.id!==id));
+    renderMenuAdmin();
+  }
+
+  function addItem() {
+    const name = document.getElementById('mName').value.trim();
+    const price = parseInt(document.getElementById('mPrice').value);
+    const desc = document.getElementById('mDesc').value.trim();
+    const cat = document.getElementById('mCat').value;
+    const type = document.getElementById('mType').value;
+    if(!name||!price||!desc) { alert('Please fill in name, price and description.'); return; }
+    const menu = getMenu();
+    menu.push({ id:Date.now(), name, desc, price, cat, type, available:true });
+    saveMenu(menu);
+    document.getElementById('mName').value='';
+    document.getElementById('mPrice').value='';
+    document.getElementById('mDesc').value='';
+    const s = document.getElementById('addSuccess');
+    s.style.display='block';
+    setTimeout(()=>s.style.display='none', 3000);
+  }
+</script>
+</body>
+</html>
